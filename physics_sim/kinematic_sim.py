@@ -7,7 +7,7 @@ LearningClimbingMovements 핵심 구현
 import numpy as np
 
 # 팔/다리 관절 제한
-ARM_LENGTH = 0.7  # 팔 길이
+ARM_LENGTH = 1.2  # 팔 길이
 LEG_LENGTH = 0.6  # 다리 길이
 TORSO_HEIGHT = 0.4  # 몸통 높이
 
@@ -15,7 +15,8 @@ TORSO_HEIGHT = 0.4  # 몸통 높이
 class KinematicClimber:
     """Kinematic 등반 시뮬레이션"""
     
-    def __init__(self):
+    def __init__(self, arm_length=1.2):
+        self.ARM_LENGTH = arm_length  # 인스턴스 변수로
         self.torso = np.array([2.0, 0.5, 0])
         self.handL = np.array([1.5, 0.8, 0])
         self.handR = np.array([2.5, 0.8, 0])
@@ -31,24 +32,25 @@ class KinematicClimber:
     
     def move_hand(self, target, hand='L'):
         """손을 목표 위치로 이동 (근거리 한계)"""
+        arm_len = getattr(self, 'ARM_LENGTH', 1.2)  # 기본값 1.2
+        
         if hand == 'L':
             dist = np.linalg.norm(target - self.handL)
-            if dist <= ARM_LENGTH:
+            if dist <= arm_len:
                 self.handL = target.copy()
                 return True
             else:
-                # 최대 거리로 이동
                 direction = (target - self.handL) / dist
-                self.handL = self.handL + direction * ARM_LENGTH
+                self.handL = self.handL + direction * arm_len
                 return False
         else:
             dist = np.linalg.norm(target - self.handR)
-            if dist <= ARM_LENGTH:
+            if dist <= arm_len:
                 self.handR = target.copy()
                 return True
             else:
                 direction = (target - self.handR) / dist
-                self.handR = self.handR + direction * ARM_LENGTH
+                self.handR = self.handR + direction * arm_len
                 return False
     
     def update_torso(self):
